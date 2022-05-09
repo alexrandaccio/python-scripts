@@ -23,36 +23,45 @@ def main(argv):
         elif opt in ("-p", "--port"):
             port = arg
 
-    # skip headers (if necessary)
+    # skip headers
     next(reader)
-
-    # pull relevant data from CSV. edit this section to match the format of your CSV file
+    next(reader)
     proposals = []
     for row in reader:
         proposal = {
-            "title": row[0],
-            "description": row[1],
+            "title": row[0] + ' -- ' + row[3],
+            "description": "",
             "url": row[2],
         }
-        proposals.append(proposal)
+        proposal["description"] += '1st Chamber Sponsor(s): ' + ', '.join(row[4].split()) + '\n'
+        proposal["description"] += '2nd Chamber Sponsor(s): ' + ', '.join(row[5].split()) + '\n'
+        proposal["description"] += '\nFY22-23\n'
+        proposal["description"] += 'Revenue: ' + row[6] + '\n'
+        proposal["description"] += 'Expenditures: ' + row[7] + '\n'
+        proposal["description"] += 'Transfers: ' + row[8] + '\n'
+        proposal["description"] += 'Net Budget Impact: ' + row[9] + '\n'
+        proposal["description"] += '\nFY23-24\n'
+        proposal["description"] += 'Revenue: ' + row[10] + '\n'
+        proposal["description"] += 'Expenditures: ' + row[11] + '\n'
+        proposal["description"] += 'Transfers: ' + row[12] + '\n'
+        proposal["description"] += 'Net Budget Impact: ' + row[13] + '\n'
 
-    # arrange proposals in alphabetical order (if necessary)
+        proposals.append(proposal)
     proposals.sort(key=lambda p: p['title'].split(' -- ')[1])
 
-    # create the event payload. customize your event data below
     headers = {
         'Content-Type': 'application/json',
     }
     data = {
-        "event_title": "My Event Title",
+        "event_title": "Ongoing General Fund Prioritization [test]",
         "event_description": "",
         "num_voters": 10,
-        "credits_per_voter": 99,
-        "start_event_date": "2022-04-13T17:00:00.057Z",
-        "end_event_date": "2022-04-14T23:00:00.057Z",
+        "credits_per_voter": 100,
+        "start_event_date": "2022-04-04T20:55:52.057Z",
+        "end_event_date": "2022-04-20T20:55:52.057Z",
         "subjects": proposals,
     }
-    url = 'https://quadraticvote.radicalxchange.org' if not dev else 'http://localhost:' + port
+    url = 'https://colorado.qv.radicalxchange.org' if not dev else 'http://localhost:' + port
     r = requests.post(
         url + '/api/events/create',
         headers=headers,
